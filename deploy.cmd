@@ -88,7 +88,7 @@ goto :EOF
 :Deployment
 echo Handling node.js deployment.
 
-:: 0. Select node version
+:: 0. Select node version for build
 call :SelectNodeVersion
 
 :: 1. Install build dependencies
@@ -103,13 +103,13 @@ call :ExecuteCmd !NPM_CMD! run-script build
 IF !ERRORLEVEL! NEQ 0 goto error
 popd
 
-:: 3. KuduSync
+:: 3. KuduSync - moves only the necessary files to %deployment_target%
 IF /I "%IN_PLACE_DEPLOYMENT%" NEQ "1" (
   call :ExecuteCmd "%KUDU_SYNC_CMD%" -v 50 -f "%DEPLOYMENT_SOURCE%\site" -t "%DEPLOYMENT_TARGET%" -n "%NEXT_MANIFEST_PATH%" -p "%PREVIOUS_MANIFEST_PATH%" -i ".git;.hg;.deployment;deploy.cmd"
   IF !ERRORLEVEL! NEQ 0 goto error
 )
 
-:: 4. Select node version
+:: 4. Select node version for Node app
 call :SelectNodeVersion
 
 :: 5. Install npm packages
